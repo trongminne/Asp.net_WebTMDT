@@ -1,0 +1,203 @@
+﻿
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<p style="padding-top: 20px">
+  
+    <button class="btn btn-danger" id="btnDeleteSelected" onclick="confirmDeleteSelected()">Xoá các mục đã chọn</button>
+</p>
+
+<table class="table table-bordered" id="data_product" cellspacing="0">
+    <thead>
+        <tr>
+            <th>
+                <div class="form-check form-check-muted m-0 cntr">
+                    <input type="checkbox" class="customcheckbox hidden-xs-up" id="cbx" onchange="checkAll(this)" class="form-check-input hidden-xs-up">
+                </div>
+            </th>
+
+            <th>
+                STT
+            </th>
+
+            <th>
+                Tên người dùng
+            </th>
+            <th>
+                Ảnh
+            </th>
+          
+            <th>Chức năng</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @{ var i = 0; }
+        @if (ViewBag.Users != null)
+        {
+            foreach (var item in ViewBag.Users)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" id="checkkhoa" value="@item.Id" style="margin-left: 20px">
+                    </td>
+                    <td>@(i + 1)</td>
+                    <td>
+                        @item.FirstName @item.LastName
+
+                    </td>
+
+                    <td>
+                        <img src="@Url.Content("~/Content/images/upload/" + item.Avatar)" width="50px" style="border-radius:5px" />
+                    </td>
+
+                    <td>
+                       
+                        <button class="btn btn-danger" onclick="confirmDelete(@item.Id)">Xoá</button>
+                    </td>
+                </tr>
+                i++;
+            }
+        }
+        </tbody>
+
+</table>
+
+@* Check box all *@
+<script>
+
+    var checkkhoa = document.querySelectorAll("#checkkhoa");
+
+    function checkAll(myCheckbox) {
+        if (myCheckbox.checked == true) {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = true;
+            });
+        } else {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = false;
+            });
+        }
+    }
+</script>
+
+@*// Delete*@
+
+<script>
+function confirmDelete(id) {
+    swal({
+        title: "Bạn có chắc muốn xóa người dùng này?",
+        text: "Sau khi xóa, người dùng sẽ không thể phục hồi!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willDelete) => {
+        if (willDelete) {
+            $.ajax({
+                url: "@Url.Action("Delete", "User")/" + id,
+                type: "POST",
+                success: function (result) {
+                    swal({
+                        title: "Thành công!",
+                        text: "Người dùng đã được xoá",
+                        icon: "success",
+                        timer: 3000,
+                        buttons: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function () {
+                    swal({
+                        title: "Lỗi khi xoá người dùng!",
+                        text: "Vui lòng thử lại sau.",
+                        icon: "error",
+                    });
+                }
+            });
+        }
+    });
+}
+</script>
+
+@*// Xoá nhiều*@
+<script>
+    var checkkhoa = document.querySelectorAll("#checkkhoa");
+    var selectedIds = [];
+
+    function checkAll(myCheckbox) {
+        if (myCheckbox.checked == true) {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = true;
+                if (selectedIds.indexOf(checkbox.value) < 0) {
+                    selectedIds.push(checkbox.value);
+                }
+            });
+        } else {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = false;
+                var index = selectedIds.indexOf(checkbox.value);
+                if (index >= 0) {
+                    selectedIds.splice(index, 1);
+                }
+            });
+        }
+    }
+
+    function confirmDeleteSelected() {
+        if (selectedIds.length > 0) {
+            swal({
+                title: "Bạn có chắc muốn xóa các người dùng đã chọn?",
+                text: "Sau khi xóa, các người dùng sẽ không thể phục hồi!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: "@Url.Action("DeleteSelected", "User")",
+                        type: "POST",
+                        data: { ids: selectedIds },
+                        success: function (result) {
+                            swal({
+                                title: "Thành công!",
+                                text: "Các người dùng này đã được xoá",
+                                icon: "success",
+                                timer: 3000,
+                                buttons: false,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function () {
+                            swal({
+                                title: "Lỗi khi xoá người dùng!",
+                                text: "Vui lòng thử lại sau.",
+                                icon: "error",
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            swal("Vui lòng chọn ít nhất một người dùng để xoá!");
+        }
+    }
+
+    checkkhoa.forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+            var index = selectedIds.indexOf(this.value);
+            if (this.checked && index < 0) {
+                selectedIds.push(this.value);
+            } else if (!this.checked && index >= 0) {
+                selectedIds.splice(index, 1);
+                selectedIds.splice(index, 1);
+            }
+        });
+    });
+</script>

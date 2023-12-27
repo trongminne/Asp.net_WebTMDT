@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="4f9ec501f3f74b52b8a80600a10dec83" Name="Diagram1" ZoomLevel="71">
+        <EntityTypeShape EntityType="WebBanHangModel.Brand" Width="1.5" PointX="10" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="WebBanHangModel.Category" Width="1.5" PointX="9.75" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="WebBanHangModel.Order" Width="1.5" PointX="1.625" PointY="4.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="WebBanHangModel.OrderDetail" Width="1.5" PointX="5" PointY="7.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="WebBanHangModel.Product" Width="1.5" PointX="6.75" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="WebBanHangModel.User" Width="1.5" PointX="4" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="WebBanHangModel.sysdiagram" Width="1.5" PointX="0.5" PointY="8" />
+        <EntityTypeShape EntityType="WebBanHangModel.Code" Width="1.5" PointX="2.375" PointY="7.875" />
+        <EntityTypeShape EntityType="WebBanHangModel.danhgia" Width="1.5" PointX="3.5" PointY="0.5" />
+        <EntityTypeShape EntityType="WebBanHangModel.Comment" Width="1.5" PointX="8" PointY="7.5" />
+        <AssociationConnector Association="WebBanHangModel.FK_Product_Brand" />
+        <AssociationConnector Association="WebBanHangModel.FK_Product_Category" />
+        <AssociationConnector Association="WebBanHangModel.FK_Comment_Product" />
+        <AssociationConnector Association="WebBanHangModel.FK_Comment_Users" />
+        <AssociationConnector Association="WebBanHangModel.FK_danhgia_Product" />
+        <AssociationConnector Association="WebBanHangModel.FK_danhgia_Users" />
+        <AssociationConnector Association="WebBanHangModel.FK_Order_Users1" />
+        <AssociationConnector Association="WebBanHangModel.FK_OrderDetail_Product" />
+        <AssociationConnector Association="WebBanHangModel.FK_OrderDetail_Users" />
+        <AssociationConnector Association="WebBanHangModel.FK_OrderDetail_Order" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

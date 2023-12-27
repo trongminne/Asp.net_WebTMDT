@@ -1,0 +1,342 @@
+﻿@model IEnumerable<WebBanHang.Context.OrderDetailDTO>
+
+
+@{
+    /**/
+
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="d-flex justify-content-start align-items-center" style="padding: 10px">
+    <form action="@Url.Action("ExportExcel", "Order")" method="post" id="export-form">
+        <select name="status" class="select2 form-select-sm w-auto me-1" style="margin-right: 10px;" onchange="updateExportUrl()">
+            <option value="" selected="selected">Tất cả</option>
+            <option value="0">Chờ xác nhận</option>
+            <option value="1">Đang giao</option>
+            <option value="2">Đã nhận hàng</option>
+        </select>
+        <button type="button" class="btn btn-primary btn-sm me-1" style="margin-right: 10px;" onclick="confirmExport()">Xuất excel</button>
+    </form>
+
+    <script>
+        function confirmExport() {
+            // Get the selected status
+            var status = document.getElementsByName("status")[0].value;
+
+            // If the selected status is "Chờ xác nhận"
+            if (status == 0 && status != '') {
+                // Display a warning message using Swal
+                Swal.fire({
+                    title: 'Bạn có đồng ý xuất không?',
+                    text: 'Khi xuất sẽ chuyển sang trạng thái đang giao hàng',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit the form without changing the status
+                        document.getElementById("export-form").submit();
+                    }
+                });
+            } else {
+                // If the selected status is not "Chờ xác nhận", submit the form
+                document.getElementById("export-form").submit();
+            }
+        }
+    </script>
+
+
+    <button class="btn btn-danger btn-sm me-2" id="btnDeleteSelected" onclick="confirmDeleteSelected()">Huỷ các mục đã chọn</button>
+</div>
+
+
+
+<table class="table table-bordered" id="data_product" cellspacing="0">
+    <thead>
+        <tr>
+            <th>
+                <div class="form-check form-check-muted m-0 cntr">
+                    <input type="checkbox" class="customcheckbox hidden-xs-up" id="cbx" onchange="checkAll(this)" class="form-check-input hidden-xs-up">
+                </div>
+            </th>
+            <th>
+                STT
+            </th>
+
+
+            <th>
+                Tên sản phẩm
+            </th>
+            <th>
+                Tên khách hàng
+            </th>
+            <th>
+                Số điện thoại
+            </th>
+
+            <th>
+                Ảnh
+            </th>
+            <th>
+                Số lượng
+            </th>
+            <th>
+                Giá
+            </th>
+            <th>
+                Thanh toán
+            </th>
+            <th>
+                Thành chữ
+            </th>
+            <th>
+                Ngày đặt
+            </th>
+            <th>
+                Trạng thái
+            </th>
+            <th>
+                Chức năng
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ var i = 0; }
+        @foreach (var item in Model)
+        {
+        <tr>
+
+            @if (item.Status == 2)
+            {
+                <td></td>
+            }
+            else
+            {
+                <td>
+                    <input type="checkbox" id="checkkhoa" value="@item.Id" style="margin-left: 20px">
+                </td>
+            }
+            <td>@(i + 1)</td>
+
+            <td>
+                <a href="@Url.Action("Detail", "Product", new { area = "", id = item.ProductId })">@item.ProductName</a>
+            </td>
+            <td>@item.FirstName &nbsp @item.LastName</td>
+            <td>@item.Phone</td>
+
+            <td>
+                <img src="@Url.Content("~/Content/images/upload/" + item.ProductAvatar)" width="50px" style="border-radius:5px" />
+            </td>
+            <td>@item.Quantity</td>
+            <td> @String.Format("{0:#,###}", item.ProductPrice) ₫</td>
+            <td>@String.Format("{0:#,###}", item.Pay) ₫</td>
+            <td>
+                @item.PayToWord đồng
+            </td>
+            <td>@item.CreatedOnUtc</td>
+
+            @if (item.Status == 1)
+            {
+                <td> Đang giao hàng</td>
+                <td>
+                    @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+
+                    <button class="btn btn-danger" onclick="confirmDelete(@item.Id)">Huỷ</button>
+                </td>
+            }
+            else if (item.Status == 2)
+            {
+                <td> Đã nhận hàng</td>
+                <td></td>
+            }
+            else
+            {
+                <td> Chờ xác nhận</td>
+                <td>
+
+                    <button id="giaoHangBtn" class="btn btn-info" onclick="confirmGiaoHang(@item.Id)">Giao hàng</button>
+                    @Html.ActionLink("Sửa", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+
+                    <input type="hidden" id="quantity" value="@item.Quantity" />
+                    <button class="btn btn-danger" onclick="confirmDelete(@item.Id)">Huỷ</button>
+
+                </td>
+            }
+
+
+        </tr>
+            i++;
+        }
+    </tbody>
+</table>
+
+@* chuyển sang giao hàng *@
+<script>
+  function confirmGiaoHang(id) {
+    swal({
+      title: "Bạn có chắc đã giao đơn hàng này?",
+
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((confirm) => {
+      if (confirm) {
+        $.ajax({
+          url: '@Url.Action("EditStatus", "Order")',
+          type: 'POST',
+          data: { id: id, status: 1 },
+
+          });
+          swal({
+              title: "Thành công!",
+              text: " Đơn hàng đã được giao",
+              icon: "success",
+              timer: 3000,
+              buttons: false,
+          }).then(() => {
+              location.reload();
+          });
+      }
+    });
+  }
+</script>
+
+
+@* Check box all *@
+<script>
+
+    var checkkhoa = document.querySelectorAll("#checkkhoa");
+
+    function checkAll(myCheckbox) {
+        if (myCheckbox.checked == true) {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = true;
+            });
+        } else {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = false;
+            });
+        }
+    }
+</script>
+
+@*// Delete*@
+<script>
+    function confirmDelete(id, quantity) {
+        var quantity = $('#quantity').val();
+    swal({
+        title: "Bạn có chắc muốn huỷ đơn hàng này?",
+        text: "Sau khi huỷ,  đơn hàng sẽ không thể phục hồi!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willDelete) => {
+        if (willDelete) {
+            $.ajax({
+                url: "@Url.Action("Delete", "Order")/" + id,
+                type: "POST",
+                data: { quantity: quantity },
+                success: function (result) {
+                    swal({
+                        title: "Thành công!",
+                        text: " Đơn hàng đã được huỷ",
+                        icon: "success",
+                        timer: 3000,
+                        buttons: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function () {
+                    swal({
+                        title: "Lỗi khi huỷ  đơn hàng!",
+                        text: "Vui lòng thử lại sau.",
+                        icon: "error",
+                    });
+                }
+            });
+        }
+    });
+}
+</script>
+
+@*// huỷ nhiều*@
+<script>
+    var checkkhoa = document.querySelectorAll("#checkkhoa");
+    var selectedIds = [];
+
+    function checkAll(myCheckbox) {
+        if (myCheckbox.checked == true) {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = true;
+                if (selectedIds.indexOf(checkbox.value) < 0) {
+                    selectedIds.push(checkbox.value);
+                }
+            });
+        } else {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = false;
+                var index = selectedIds.indexOf(checkbox.value);
+                if (index >= 0) {
+                    selectedIds.splice(index, 1);
+                }
+            });
+        }
+    }
+
+    function confirmDeleteSelected() {
+        if (selectedIds.length > 0) {
+            swal({
+                title: "Bạn có chắc muốn huỷ các đơn hàng đã chọn?",
+                text: "Sau khi huỷ, các  đơn hàng sẽ không thể phục hồi!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: "@Url.Action("DeleteSelected", "Order")",
+                        type: "POST",
+                        data: { ids: selectedIds },
+                        success: function (result) {
+                            swal({
+                                title: "Thành công!",
+                                text: "Các đơn hàng đã được huỷ",
+                                icon: "success",
+                                timer: 3000,
+                                buttons: false,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function () {
+                            swal({
+                                title: "Lỗi khi huỷ  đơn hàng!",
+                                text: "Vui lòng thử lại sau.",
+                                icon: "error",
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            swal("Vui lòng chọn ít nhất một  đơn hàng để huỷ!");
+        }
+    }
+
+    checkkhoa.forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+            var index = selectedIds.indexOf(this.value);
+            if (this.checked && index < 0) {
+                selectedIds.push(this.value);
+            } else if (!this.checked && index >= 0) {
+                selectedIds.splice(index, 1);
+                selectedIds.splice(index, 1);
+            }
+        });
+    });
+</script>

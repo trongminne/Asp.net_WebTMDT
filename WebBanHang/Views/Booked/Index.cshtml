@@ -1,0 +1,344 @@
+﻿@model IEnumerable<WebBanHang.Context.OrderDetailDTO>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@* Kiểm tra sản phẩm đã dánh giá chưa nếu đánh giá rồi thì bỏ nút đánh giá *@
+
+@using WebBanHang.Context
+@{
+    WebBanHangEntities objWebBanHangEntities = new WebBanHangEntities();
+
+}
+
+@* end *@
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+    <div class="container">
+        <div class="row">
+            <main class="col-md-12">
+                <div class="card" style="padding: 10px">
+                    <form id="xoanhieu-form">
+
+                        <table class="table table-borderless table-shopping-Booked" id="data_product">
+                            <thead class="text-muted">
+                                <tr class="small text-uppercase">
+                                    <th>
+                                        <div class="form-check form-check-muted m-0 cntr">
+                                            <input type="checkbox" class="customcheckbox hidden-xs-up" id="cbx" onchange="checkAll(this)" class="form-check-input hidden-xs-up" style="margin-left:-19px">
+                                        </div>
+                                    </th>
+                                    <th scope="col">STT</th>
+
+                                    <th scope="col">Sản phẩm</th>
+                                    <th scope="col" width="120">Số lượng</th>
+                                    <th scope="col" width="120">Thanh toán</th>
+                                    <th scope="col" width="120">Bằng chữ</th>
+                                    <th scope="col" width="120">Ngày đặt</th>
+                                    <th scope="col" width="120"> Trạng thái</th>
+
+                                    <th scope="col" class="text-right" width="200"> <button type="button" class="btn btn-danger float-md-right Delete-selected-items" onclick="confirmDeleteSelected()">Huỷ nhiều</button> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @if (Model != null)
+                                {
+                                    var i = 1;
+
+                                    foreach (var item in Model)
+                                    {
+                                        @* Kiểm tra sản phẩm đã dánh giá chưa nếu đánh giá rồi thì bỏ nút đánh giá *@
+                                        int productId = item.ProductId.GetValueOrDefault();
+
+                                        int userId = (int)Session["idUser"];
+                                        // Lấy điểm đánh giá của sản phẩm productId từ người dùng userId
+                                        var rating = objWebBanHangEntities.danhgias.FirstOrDefault(r => r.ProductId == productId && r.UserId == userId);
+                                        if (rating != null)
+                                        {
+                                            ViewBag.PointRatingUser = rating.Point;
+                                        }
+                                        @* end *@
+
+                                        <tr id="product-@item.Id">
+                                            @if (item.Status == 1)
+                                            {
+                                                <td></td>
+                                            }
+                                            else if (item.Status == 2)
+                                            {
+                                                <td></td>
+                                            }
+                                            else
+                                            {
+                                                <td><input type="checkbox" id="checkkhoa" class="Booked-item-check" value="@item.Id" /></td>
+
+                                            }
+                                            <td>@(i++)</td>
+
+                                            <td>
+                                                <figure class="itemside">
+                                                    <div class="aside"><img src="~/Content/images/upload/@item.ProductAvatar" class="img-sm"></div>
+                                                    <figcaption class="info">
+                                                        <a href="@Url.Action("Detail", "Product", new { Id = item.ProductId })" class="title text-dark">@item.ProductName</a>
+                                                    </figcaption>
+                                                </figure>
+                                            </td>
+                                            <td>
+                                                @item.Quantity
+
+                                            </td>
+                                            <td>
+                                                <div class="price-wrap">
+                                                    <var class="price price-display" style="font-size: 20px">  @String.Format("{0:#,###}", item.Pay) ₫ </var>
+                                                </div> <!-- price-wrap .// -->
+                                            </td>
+
+                                            <td>
+                                               @item.PayToWord đồng
+                                            </td>
+
+                                            <td>@item.CreatedOnUtc</td>
+
+                                            @if (item.Status == 1)
+                                            {
+                                                <td> Đang giao hàng</td>
+                                                <td class="text-right">
+                                                    <input type="hidden" value="@item.Id" class="Id" />
+                                                    <a data-original-title="Thích sản phẩm" title="" href="" class="btn btn-light" data-toggle="tooltip" onclick="danhgia(event)"> <i class="fa fa-heart"></i></a>
+                                                    <a href="#" class="btn btn-success" onclick="updateStatus(@item.Id)">Đã nhận được hàng</a>
+
+                                                </td>
+                                            }
+                                            else if (item.Status == 2)
+                                            {
+                                                <td> Đã nhận hàng </td>
+                                                if (ViewBag.PointRatingUser == null)
+                                                {
+                                                    <td>
+                                                        <a href="@Url.Action("Detail", "Product", new { Id = item.ProductId })" class="btn btn-success" style="float: right">Đánh giá</a>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                <td> Chờ xác nhận</td>
+                                                <td class="text-right">
+                                                    <a data-original-title="Thích sản phẩm" title="" href="" class="btn btn-light" data-toggle="tooltip" onclick="danhgia(event)"> <i class="fa fa-heart"></i></a>
+
+                                                    <input type="hidden" id="quantity" value="@item.Quantity" />
+                                                    <input type="button" class="btn btn-danger" onclick="confirmDelete(@item.Id)" value="Huỷ">
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+
+                                }
+
+
+                            </tbody>
+                        </table>
+                        <div class="card-body border-top">
+
+                            <a href="~/Home/Index" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Tiếp tục mua </a>
+
+                        </div>
+                    </form>
+
+                </div> <!-- card.// -->
+                <div class="alert alert-success mt-3">
+                    <p class="icontext"><i class="icon text-success fa fa-truck"></i> Miễn phí ship toàn quốc</p>
+                </div>
+            </main> <!-- col.// -->
+
+        </div>
+    </div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+@* Huỷ sản phẩm  *@
+@*// Delete*@
+<script>
+    function confirmDelete(id, quantity) {
+    var quantity = $('#quantity').val();
+    swal({
+        title: "Bạn có chắc muốn huỷ đơn hàng này?",
+        text: "Sau khi huỷ, bạn vẫn có thể đặt lại!",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+    .then((willDelete) => {
+        if (willDelete) {
+            $.ajax({
+                url: "@Url.Action("Delete", "Booked")",
+                type: "POST",
+                data: { id: id }, // Sử dụng tham số 'id' thay vì 'quantity'
+                success: function (result) {
+                    swal({
+                        title: "Thành công!",
+                        text: "Đơn hàng đã được huỷ",
+                        icon: "success",
+                        timer: 3000,
+                        buttons: false,
+                    }).then(() => {
+                        location.reload();
+                    });
+                },
+                error: function () {
+                    swal({
+                        title: "Lỗi khi huỷ đơn hàng!",
+                        text: "Vui lòng thử lại sau.",
+                        icon: "error",
+                    });
+                }
+            });
+        }
+    });
+}
+
+</script>
+
+
+@*// huỷ nhiều*@
+<script>
+    var checkkhoa = document.querySelectorAll("#checkkhoa");
+    var selectedIds = [];
+
+    function checkAll(myCheckbox) {
+        if (myCheckbox.checked == true) {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = true;
+                if (selectedIds.indexOf(checkbox.value) < 0) {
+                    selectedIds.push(checkbox.value);
+                }
+            });
+        } else {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = false;
+                var index = selectedIds.indexOf(checkbox.value);
+                if (index >= 0) {
+                    selectedIds.splice(index, 1);
+                }
+            });
+        }
+    }
+
+    function confirmDeleteSelected() {
+        if (selectedIds.length > 0) {
+            swal({
+                title: "Bạn có chắc muốn huỷ các sản phẩm đã chọn?",
+                text: "Sau khi huỷ, bạn có thể đặt lại!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((willDelete) => {
+                if (willDelete) {
+                    $.ajax({
+                        url: "@Url.Action("DeleteSelected", "Booked")",
+                        type: "POST",
+                        data: { ids: selectedIds },
+                        success: function (result) {
+                            swal({
+                                title: "Thành công!",
+                                text: "Các sản phẩm đã được huỷ",
+                                icon: "success",
+                                timer: 3000,
+                                buttons: false,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function () {
+                            swal({
+                                title: "Lỗi khi huỷ sản phẩm!",
+                                text: "Vui lòng thử lại sau.",
+                                icon: "error",
+                            });
+                        }
+                    });
+                }
+            });
+        } else {
+            swal("Vui lòng chọn ít nhất một sản phẩm để huỷ!");
+        }
+    }
+
+    checkkhoa.forEach(function (checkbox) {
+        checkbox.addEventListener("change", function () {
+            var index = selectedIds.indexOf(this.value);
+            if (this.checked && index < 0) {
+                selectedIds.push(this.value);
+            } else if (!this.checked && index >= 0) {
+                selectedIds.splice(index, 1);
+                selectedIds.splice(index, 1);
+            }
+        });
+    });
+</script>
+
+@* Xác nhận đã nhận hàng *@
+<script>
+function updateStatus(orderId) {
+    Swal.fire({
+        title: 'Bạn đã chắc chắn nhận được hàng?',
+        text: '',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Đã nhận được',
+        cancelButtonText: 'Chưa nhận được'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '@Url.Action("UpdateStatus", "Booked")',
+                type: 'POST',
+                data: { orderId: orderId },
+                success: function (result) {
+                    if (result.success) {
+                        // Cập nhật trạng thái của đơn hàng trong view
+                        $('#product-' + orderId + ' td:nth-child(7)').html('Đã giao hàng');
+                        $('#product-' + orderId + ' td:nth-child(8) a.btn-danger').hide();
+                        $('#product-' + orderId + ' td:nth-child(8) a.btn-light').show();
+
+                        // Hiển thị thông báo thành công
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thank you!',
+                            text: 'Cảm ơn bạn đã ủng hộ shop!'
+                        }).then(() => {
+                            // Load lại trang
+                            location.reload();
+                        });
+                    } else {
+                        // Hiển thị thông báo thất bại
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Thất bại',
+                            text: 'Có lỗi xảy ra, vui lòng thử lại sau'
+                        });
+                    }
+                },
+                error: function () {
+                    // Hiển thị thông báo thất bại
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Thất bại',
+                        text: 'Có lỗi xảy ra, vui lòng thử lại sau'
+                    });
+                }
+            });
+        }
+    })
+}
+</script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>

@@ -1,0 +1,524 @@
+﻿@model IEnumerable<WebBanHang.Models.CartModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+    <div class="container">
+        <div class="row">
+            <main class="col-md-9">
+                <div class="card" style="padding: 10px">
+                    <form id="xoanhieu-form">
+
+                        <table class="table table-borderless table-shopping-cart" id="data_product">
+                            <thead class="text-muted">
+                                <tr class="small text-uppercase">
+                                    <th>
+                                        <div class="form-check form-check-muted m-0 cntr">
+                                            <input type="checkbox" class="customcheckbox hidden-xs-up" id="cbx" onchange="checkAll(this)" class="form-check-input hidden-xs-up" style="margin-left:-19px">
+                                        </div>
+                                    </th>
+                                    <th scope="col">STT</th>
+                                    <th scope="col">Sản phẩm</th>
+                                    <th scope="col" width="120">Số lượng</th>
+                                    <th scope="col" width="120">Giá</th>
+
+                                    <th scope="col" class="text-right" width="200"> <button type="button" class="btn btn-danger float-md-right remove-selected-items">Xoá nhiều</button> </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{ var i = 0; }
+                                @if (Model != null)
+                                {
+                                    foreach (var item in Model)
+                                    {
+                                        <tr id="product-@item.Product.id">
+                                            <td><input type="checkbox" id="checkkhoa" class="cart-item-check" value="@item.Product.id" /></td>
+                                            <td>@(i + 1)</td>
+
+                                            <td>
+                                                <figure class="itemside">
+                                                    <div class="aside"><img src="~/Content/images/upload/@item.Product.Avatar" class="img-sm"></div>
+                                                    <figcaption class="info">
+                                                        <a href="@Url.Action("Detail", "Product", new { Id = item.Product.id })" class="title text-dark">@item.Product.Name</a>
+                                                    </figcaption>
+                                                </figure>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control quantity-input" value="@item.Quantity" min="1" data-price="@item.Product.Price" data-item-id="@item.Product.id" oninput="validateQuantityInput(this)">
+
+                                            </td>
+                                            <td>
+                                                <div class="price-wrap">
+                                                    <var id="price-@item.Product.id" class="price price-display" style="font-size: 20px">  @String.Format("{0:#,###}", item.Product.Price * item.Quantity) ₫ </var>
+                                                </div> <!-- price-wrap .// -->
+                                            </td>
+
+                                            <td class="text-right">
+                                                <input type="hidden" value="@item.Product.id" class="product-id" />
+                                                <a data-original-title="Thích sản phẩm" title="" href="" class="btn btn-light" data-toggle="tooltip" onclick="danhgia(event)"> <i class="fa fa-heart"></i></a>
+                                                <a href="" class="btn btn-light remove-cart"> Xoá</a>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                }
+
+                            </tbody>
+                        </table>
+
+
+                        <div class="card-body border-top">
+                            @if (Model != null)
+                            {
+                                <a href="#" class="btn btn-success float-md-right ml-2 save-cart-btn" data-url="@Url.Action("SaveCart", "Cart")" style="display: none;"> Lưu giỏ hàng </a>
+                                
+                                <a href="#" id="btnOrder" class="btn btn-primary float-md-right" data-url="@Url.Action("Index", "Payments")"> Đặt hàng </a>
+                                <input type="hidden" id="sumPriceInput" name="SumPrice" value="" />
+                            }
+                            <a href="" class="btn btn-light float-md-right ml-2"> Thanh toán trực tuyến </a>
+
+                            <a href="~/Home/Index" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Tiếp tục mua </a>
+
+                        </div>
+                    </form>
+
+                </div> <!-- card.// -->
+                <div class="alert alert-success mt-3">
+                    <p class="icontext"><i class="icon text-success fa fa-truck"></i> Miễn phí ship toàn quốc</p>
+                </div>
+            </main> <!-- col.// -->
+            <aside class="col-md-3">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <form>
+                            <div class="form-group">
+                                <label>Phiếu giảm giá</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="code" placeholder="Nhập mã">
+                                    <span class="input-group-append">
+                                        <button type="submit" class="btn btn-primary">Áp dụng</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div> <!-- card-body.// -->
+                </div>  <!-- card .// -->
+                <div class="card">
+                    <div class="card-body">
+                        @if (ViewBag.Price != null)
+                        {
+                            <dl class="dlist-align">
+                                <dt>Tổng giá: </dt>
+                                <dd class="text-right" id="originalPrice"></dd>
+                            </dl>
+
+                            <dl class="dlist-align">
+                                <dt>Giảm giá: </dt>
+                                <dd class="text-right">- @String.Format("{0:#,###}", @ViewBag.Price) ₫</dd>
+                            </dl>
+                        }
+
+
+
+                        @* Xuất tổng tiền của danh sách sản phẩm *@
+                        <dl class="dlist-align">
+                            <dt>Thanh toán: </dt>
+                            <dd class="text-right h5"><strong id="totalPrice"></strong></dd>
+                        </dl>
+
+                        @* end Xuất tổng tiền của danh sách sản phẩm *@
+
+
+                        <hr>
+                        <p class="text-center mb-3">
+                            <img src="~/Content/images/misc/payments.png" height="26">
+                        </p>
+
+                    </div> <!-- card-body.// -->
+                </div>  <!-- card .// -->
+            </aside> <!-- col.// -->
+        </div>
+    </div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+@* Xoá sản phẩm giỏ hàng *@
+<script type="text/javascript">
+    $(function () {
+        $(".remove-cart").click(function () {
+            var model = {};
+            model.Id = $(this).closest('tr').find('.product-id').val();
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Remove", "Cart")',
+                data: JSON.stringify(model),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function () {
+                    $('#CartCount').text(@Session["count"] -1);
+                    $("#product-" + model.Id).remove();
+                    Swal.fire({
+                        title: 'Thành công',
+                        text: 'Đã xoá sản phẩm khỏi giỏ hàng thành công!',
+                        icon: 'success',
+                        confirmButtonColor: '#43b581',
+                        confirmButtonText: 'OK'
+                    }).then(function () {
+                        location.reload();
+                    });
+              },
+                error: function () {
+                    alert("Lỗi trong khi xoá khỏi giỏ hàng!");
+                 }
+               });
+                 return false;
+      });
+ });
+</script>
+
+
+@* Check box *@
+<script>
+
+    var checkkhoa = document.querySelectorAll("#checkkhoa");
+
+    function checkAll(myCheckbox) {
+        if (myCheckbox.checked == true) {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = true;
+            });
+        } else {
+            checkkhoa.forEach(function (checkbox) {
+                checkbox.checked = false;
+            });
+        }
+    }
+</script>
+
+@* Xoá nhiều *@
+<script>
+    $(function () {
+    $(".remove-selected-items").click(function () {
+        var selectedItems = [];
+        $(".cart-item-check:checked").each(function () {
+            selectedItems.push($(this).val());
+        });
+
+        if (selectedItems.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Cảnh báo!',
+                text: 'Vui lòng chọn ít nhất một sản phẩm để xoá.'
+            });
+
+            return false;
+        }
+
+        var model = {
+            Ids: selectedItems
+        };
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("RemoveMultiple", "Cart")',
+            data: JSON.stringify(model),
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function () {
+                selectedItems.forEach(function (itemId) {
+                    $("#product-" + itemId).remove();
+                });
+                var newCount = parseInt($("#CartCount").text()) - selectedItems.length;
+                $('#CartCount').text(newCount);
+                swal.fire({
+                    title: 'Thành công',
+                    text: 'Đã xoá sản phẩm khỏi giỏ hàng thành công!',
+                    icon: 'success',
+                    confirmButtonColor: '#43b581',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
+    //
+            },
+            error: function () {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi!',
+                    text: 'Có lỗi xảy ra trong quá trình xoá sản phẩm.'
+                });
+
+            }
+        });
+
+        return false;
+    });
+});
+
+</script>
+
+@* Xử lý sk đặt hàng *@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function () {
+        $("#btnOrder").click(function (e) {
+            e.preventDefault();
+            if ('@Session["idUser"]' == "") {
+                Swal.fire({
+                    title: 'Thông báo',
+                    text: 'Bạn phải đăng nhập mới đặt hàng được.',
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '@Url.Action("Login", "Home")';
+                    }
+                });
+            }
+            else {
+
+                var sumPrice = $("#sumPriceInput").val();
+                $.ajax({
+                    url: $(this).data("url"),
+                    type: "POST",
+                    data: { SumPrice: sumPrice }
+                });
+                Swal.fire({
+                      title: 'Thành công!',
+                      text: 'Đặt hàng thành công!',
+                      icon: 'success',
+                      confirmButtonText: 'OK',
+                      confirmButtonColor: '#28a745',
+                      showCancelButton: true,
+                    cancelButtonText: 'Đặt hàng khác',
+
+
+                    }).then((result) => {
+                      if (result.dismiss === Swal.DismissReason.cancel) {
+                        window.location.href = '@Url.Action("Index", "Home")';
+                      } else {
+                        window.location.href = '@Url.Action("Index", "Booked")';
+                      }
+                    });
+
+            }
+        });
+    });
+</script>
+
+@* Xuất tổng tiền và sau khi nhập code *@
+
+@if (ViewBag.Price != null)
+{
+
+    <script type="text/javascript">
+    $(function () {
+        // Hàm tính tổng số tiền
+        function calculateTotalPrice() {
+            var priceElements = document.querySelectorAll(".price-display");
+            var totalPrice = 0;
+
+            for (var i = 0; i < priceElements.length; i++) {
+                var priceString = priceElements[i].innerText.replace(/[^0-9]/g, '');
+                var price = parseInt(priceString);
+                totalPrice += price;
+            }
+
+            var a = totalPrice;
+            var totalPriceFormatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(a);
+            var originalPriceElement = document.getElementById("originalPrice");
+            originalPriceElement.innerText = totalPriceFormatted;
+
+            // Trừ đi giá trị của ViewBag.Price nếu tồn tại
+            if (@(ViewBag.Price ?? 0) > 0) {
+                totalPrice -= parseInt(@(ViewBag.Price ?? 0));
+            }
+
+            // Đảm bảo tổng số tiền không âm
+            if (totalPrice < 0) {
+                totalPrice = 0;
+            }
+
+
+            // Gán giá trị vào order.SumPrice
+            var sumPriceInput = document.getElementById("sumPriceInput");
+            sumPriceInput.value = totalPrice;
+
+
+            var totalPriceFormatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice);
+            var totalElement = document.getElementById("totalPrice");
+            totalElement.innerText = totalPriceFormatted;
+        }
+
+        // Lắng nghe sự kiện khi số lượng thay đổi
+        $(".quantity-input").on("change", function () {
+            var quantity = $(this).val();
+            var price = $(this).data("price");
+            var itemId = $(this).data("itemId");
+
+            var totalPrice = quantity * price;
+
+            // Format giá tiền và cập nhật tương ứng
+            var formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice);
+            $("#product-" + itemId + " .price-display").text(formattedPrice);
+            $("#price-" + itemId).text(formattedPrice);
+
+            // Cập nhật lại tổng số tiền
+            calculateTotalPrice();
+        });
+
+        // Tính tổng số tiền lúc load trang
+        calculateTotalPrice();
+    });
+    </script>
+
+}
+else
+{
+    @* Xuất tổng tiền và sau khi nhập code *@
+    <script type="text/javascript">
+        $(function () {
+            // Hàm tính tổng số tiền
+            function calculateTotalPrice() {
+                var priceElements = document.querySelectorAll(".price-display");
+                var totalPrice = 0;
+
+                for (var i = 0; i < priceElements.length; i++) {
+                    var priceString = priceElements[i].innerText.replace(/[^0-9]/g, '');
+                    var price = parseInt(priceString);
+                    totalPrice += price;
+                }
+
+
+                // Gán giá trị vào order.SumPrice
+                var sumPriceInput = document.getElementById("sumPriceInput");
+                sumPriceInput.value = totalPrice;
+
+                // Đảm bảo tổng số tiền không âm
+                if (totalPrice < 0) {
+                    totalPrice = 0;
+                }
+
+                var totalPriceFormatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice);
+                var totalElement = document.getElementById("totalPrice");
+                totalElement.innerText = totalPriceFormatted;
+            }
+
+            // Lắng nghe sự kiện khi số lượng thay đổi
+            $(".quantity-input").on("change", function () {
+                var quantity = $(this).val();
+                var price = $(this).data("price");
+                var itemId = $(this).data("itemId");
+
+                var totalPrice = quantity * price;
+
+                // Format giá tiền và cập nhật tương ứng
+                var formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice);
+                $("#product-" + itemId + " .price-display").text(formattedPrice);
+                $("#price-" + itemId).text(formattedPrice);
+
+                // Cập nhật lại tổng số tiền
+                calculateTotalPrice();
+            });
+
+            // Tính tổng số tiền lúc load trang
+            calculateTotalPrice();
+        });
+
+
+    </script>
+
+}
+@*// input thay đổi thì hiện nút lưu*@
+<script type="text/javascript">
+    $(function () {
+        var originalQuantities = [];
+
+        // Lấy giá trị số lượng ban đầu của tất cả input
+        $(".quantity-input").each(function () {
+            originalQuantities.push($(this).val());
+        });
+
+        // Lắng nghe sự kiện khi số lượng thay đổi
+        $(".quantity-input").on("input", function () {
+            var hasChanged = false;
+
+            // Kiểm tra xem có sự thay đổi trong số lượng không
+            $(".quantity-input").each(function (index) {
+                if ($(this).val() != originalQuantities[index]) {
+                    hasChanged = true;
+                    return false; // Thoát khỏi vòng lặp nếu có sự thay đổi
+                }
+            });
+
+            // Hiển thị hoặc ẩn nút "Lưu giỏ hàng" tùy thuộc vào sự thay đổi
+            if (hasChanged) {
+                $(".save-cart-btn").show();
+            } else {
+                $(".save-cart-btn").hide();
+            }
+        });
+    });
+</script>
+
+
+
+@* Xử lý lưu giỏ hàng *@
+<script>
+    $(document).ready(function () {
+        $(".quantity-input").on("change", function () {
+            $(".save-cart-btn").show();
+        });
+
+        $(".save-cart-btn").on("click", function (e) {
+            e.preventDefault();
+
+            var cartItems = [];
+
+            $(".cart-item-check").each(function () {
+                var itemId = $(this).val();
+                var quantity = $(this).closest("tr").find(".quantity-input").val();
+                cartItems.push({ itemId: itemId, quantity: quantity });
+            });
+
+            $.ajax({
+                url: $(this).data("url"),
+                type: "POST",
+                data: { cartItems: cartItems },
+                success: function (response) {
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: 'Đã lưu giỏ hàng thành công!',
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#28a745',
+
+                    })
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire({
+                        title: 'Lỗi',
+                        text: 'Đã xảy ra lỗi khi lưu giỏ hàng!',
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#dc3545'
+                    });
+                }
+            });
+        });
+    });
+</script>
+@* Không cho nhập số âm vào input *@
+<script>
+    function validateQuantityInput(input) {
+        var value = parseInt(input.value);
+        if (isNaN(value) || value < 1) {
+            input.value = 1; // Đặt lại giá trị là 1 nếu số nhập vào là không hợp lệ
+        }
+    }
+
+</script>

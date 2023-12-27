@@ -1,0 +1,747 @@
+﻿@model WebBanHang.Context.Product
+@{
+    ViewBag.Title = "Detail";
+
+}
+
+@using WebBanHang.Context
+@{
+    WebBanHangEntities objWebBanHangEntities = new WebBanHangEntities();
+    int productId = Model.id;
+
+
+    var commments = from c in objWebBanHangEntities.Comments
+                    join u in objWebBanHangEntities.Users on c.UserId equals u.Id
+
+                    where c.ProductId == productId
+                    select new CommentDTO
+                    {
+                        LastName = u.LastName,
+                        FirstName = u.FirstName,
+                        Avatar = u.Avatar,
+                        img1 = c.img1,
+                        img2 = c.img2,
+                        video = c.video,
+                        Comment1 = c.Comment1,
+                        CreatTime = c.CreatTime
+                    };
+
+    ViewBag.comments = commments.ToList();
+
+    ViewBag.CountOrdersuces = objWebBanHangEntities.OrderDetails.Where(n => n.ProductId == productId && n.Status == 2).Count();
+}
+
+
+<title>@Model.Name</title>
+
+<style>
+    .unrating {
+        display: none
+    }
+</style>
+
+<script type="text/javascript">
+    $(function () {
+        $("#addtocart").click(function () {
+            var model = {};
+            //lấy id sản phẩm
+            model.Id = @Model.id;
+            // lấy số lượng đặt hàng
+            model.Quantity = $("#ipQuantity").val();
+            debugger;
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AddToCart", "Cart")',
+                data:  JSON.stringify(model) ,
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function () {
+                    swal.fire({
+                        title: 'Thành công',
+                        text: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
+                        icon: 'success',
+                        confirmButtonColor: '#43b581',
+                        confirmButtonText: 'OK'
+                    })
+                    $('#CartCount').text(@Session["count"] + 1);
+                },
+                error: function () {
+                    swal.fire({
+                        title: 'Lỗi',
+                        text: 'Lỗi thêm sản phẩm vào giỏ hàng!',
+                        icon: 'error',
+                        confirmButtonColor: '#ff6b6b',
+                        confirmButtonText: 'OK'
+                    })
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content bg-white padding-y">
+    <div class="container">
+        <!-- ============================ ITEM DETAIL ======================== -->
+        <div class="row">
+            <aside class="col-md-6">
+                <div class="card">
+                    <article class="gallery-wrap">
+                        <div class="img-big-wrap">
+                            <div> <a href="#"><img id="imgBig" src="~/Content/images/upload/@Model.Avatar"></a></div>
+                        </div>
+                        <div class="thumbs-wrap">
+                            <a href="#" class="item-thumb"> <img src="~/Content/images/upload/@Model.Avatar"></a>
+                            <a href="#" class="item-thumb"> <img src="~/Content/images/upload/@Model.Avatar1"></a>
+                            <a href="#" class="item-thumb"> <img src="~/Content/images/upload/@Model.Avatar2"></a>
+                            <a href="#" class="item-thumb"> <img src="~/Content/images/upload/@Model.Avatar3"></a>
+                        </div>
+
+
+                    </article> <!-- gallery-wrap .end// -->
+                </div> <!-- card.// -->
+            </aside>
+            <main class="col-md-6">
+                <article class=-info-aside">
+                    <h2 class="title mt-3">@Model.Name</h2>
+                    <div class="rating-wrap my-3">
+                        <ul class="rating-stars">
+                            <form class="rating">
+                                <input type="hidden" id="productId" value="@Model.id">
+                                <div class="rating__stars">
+
+                                    <input id="rating-1" class="rating__input rating__input-1" type="radio" name="rating" value="1" @if (ViewBag.PointRatingUser == 1) { <text> checked</text>}>
+                                    <input id="rating-2" class="rating__input rating__input-2" type="radio" name="rating" value="2" @if (ViewBag.PointRatingUser == 2) { <text> checked</text>}>
+                                    <input id="rating-3" class="rating__input rating__input-3" type="radio" name="rating" value="3" @if (ViewBag.PointRatingUser == 3) { <text> checked</text>}>
+                                    <input id="rating-4" class="rating__input rating__input-4" type="radio" name="rating" value="4" @if (ViewBag.PointRatingUser == 4) { <text> checked</text>}>
+                                    <input id="rating-5" class="rating__input rating__input-5" type="radio" name="rating" value="5" @if (ViewBag.PointRatingUser == 5) { <text> checked</text>}>
+
+
+
+                                    <label class="rating__label" for="rating-1">
+                                        <svg class="rating__star" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                                            <g transform="translate(16,16)">
+                                                <circle class="rating__star-ring" fill="none" stroke="#000" stroke-width="16" r="8"
+                                                        transform="scale(0)" />
+                                            </g>
+                                            <g stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <g transform="translate(16,16) rotate(180)">
+                                                    <polygon class="rating__star-stroke"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="none" />
+                                                    <polygon class="rating__star-fill"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="#000" />
+                                                </g>
+                                                <g transform="translate(16,16)" stroke-dasharray="12 12" stroke-dashoffset="12">
+                                                    <polyline class="rating__star-line" transform="rotate(0)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(72)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(144)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(216)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(288)" points="0 4,0 16" />
+                                                </g>
+                                            </g>
+                                        </svg>
+                                        <span class="rating__sr">1 star—Terrible</span>
+                                    </label>
+                                    <label class="rating__label" for="rating-2">
+                                        <svg class="rating__star" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                                            <g transform="translate(16,16)">
+                                                <circle class="rating__star-ring" fill="none" stroke="#000" stroke-width="16" r="8"
+                                                        transform="scale(0)" />
+                                            </g>
+                                            <g stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <g transform="translate(16,16) rotate(180)">
+                                                    <polygon class="rating__star-stroke"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="none" />
+                                                    <polygon class="rating__star-fill"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="#000" />
+                                                </g>
+                                                <g transform="translate(16,16)" stroke-dasharray="12 12" stroke-dashoffset="12">
+                                                    <polyline class="rating__star-line" transform="rotate(0)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(72)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(144)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(216)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(288)" points="0 4,0 16" />
+                                                </g>
+                                            </g>
+                                        </svg>
+                                        <span class="rating__sr">2 stars—Bad</span>
+                                    </label>
+                                    <label class="rating__label" for="rating-3">
+                                        <svg class="rating__star" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                                            <g transform="translate(16,16)">
+                                                <circle class="rating__star-ring" fill="none" stroke="#000" stroke-width="16" r="8"
+                                                        transform="scale(0)" />
+                                            </g>
+                                            <g stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <g transform="translate(16,16) rotate(180)">
+                                                    <polygon class="rating__star-stroke"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="none" />
+                                                    <polygon class="rating__star-fill"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="#000" />
+                                                </g>
+                                                <g transform="translate(16,16)" stroke-dasharray="12 12" stroke-dashoffset="12">
+                                                    <polyline class="rating__star-line" transform="rotate(0)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(72)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(144)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(216)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(288)" points="0 4,0 16" />
+                                                </g>
+                                            </g>
+                                        </svg>
+                                        <span class="rating__sr">3 stars—OK</span>
+                                    </label>
+                                    <label class="rating__label" for="rating-4">
+                                        <svg class="rating__star" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                                            <g transform="translate(16,16)">
+                                                <circle class="rating__star-ring" fill="none" stroke="#000" stroke-width="16" r="8"
+                                                        transform="scale(0)" />
+                                            </g>
+                                            <g stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <g transform="translate(16,16) rotate(180)">
+                                                    <polygon class="rating__star-stroke"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="none" />
+                                                    <polygon class="rating__star-fill"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="#000" />
+                                                </g>
+                                                <g transform="translate(16,16)" stroke-dasharray="12 12" stroke-dashoffset="12">
+                                                    <polyline class="rating__star-line" transform="rotate(0)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(72)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(144)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(216)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(288)" points="0 4,0 16" />
+                                                </g>
+                                            </g>
+                                        </svg>
+                                        <span class="rating__sr">4 stars—Good</span>
+                                    </label>
+                                    <label class="rating__label" for="rating-5">
+                                        <svg class="rating__star" width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
+                                            <g transform="translate(16,16)">
+                                                <circle class="rating__star-ring" fill="none" stroke="#000" stroke-width="16" r="8"
+                                                        transform="scale(0)" />
+                                            </g>
+                                            <g stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <g transform="translate(16,16) rotate(180)">
+                                                    <polygon class="rating__star-stroke"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="none" />
+                                                    <polygon class="rating__star-fill"
+                                                             points="0,15 4.41,6.07 14.27,4.64 7.13,-2.32 8.82,-12.14 0,-7.5 -8.82,-12.14 -7.13,-2.32 -14.27,4.64 -4.41,6.07"
+                                                             fill="#000" />
+                                                </g>
+                                                <g transform="translate(16,16)" stroke-dasharray="12 12" stroke-dashoffset="12">
+                                                    <polyline class="rating__star-line" transform="rotate(0)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(72)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(144)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(216)" points="0 4,0 16" />
+                                                    <polyline class="rating__star-line" transform="rotate(288)" points="0 4,0 16" />
+                                                </g>
+                                            </g>
+                                        </svg>
+                                        <span class="rating__sr">5 stars—Excellent</span>
+                                    </label>
+
+                                </div>
+                            </form>
+
+                        </ul>
+
+
+                        @if (ViewBag.PointRatingUser != null)
+                        {
+                            <small class="label-rating text-muted">
+                                Điểm đánh giá @if (Session["idUser"] != null)
+                                {<span> của bạn: </span>} @ViewBag.PointRatingUser sao
+                            </small>
+
+                        }
+
+                        @if (ViewBag.CountRating != null)
+                        {
+                            <small class="label-rating text-muted">@ViewBag.CountRating lượt đánh giá</small>
+
+                        }
+                        @if (ViewBag.CountOrderdetail != null)
+                        {
+                            <small class="label-rating text-success"> <i class="fa fa-clipboard-check"></i> @ViewBag.CountOrderdetail Lượt đặt hàng </small>
+
+                        }
+
+                    </div> <!-- rating-wrap.// -->
+                    <div class="mb-3">
+                        <var class="price h4"> @String.Format("{0:#,###}", @Model.Price) </var>
+                        <span class="text-muted">₫</span>
+                    </div> <!-- price-detail-wrap .// -->
+                    <p>
+                        @Model.ShortDes
+                    </p>
+
+                    <dl class="row">
+                        <dt class="col-sm-3"> Kho:</dt>
+                        <dd class="col-sm-9"><a href="#">@Model.quantity </a></dd>
+                        <dt class="col-sm-3">Đã bán:</dt>
+                        <dd class="col-sm-9"> @ViewBag.CountOrdersuces </dd>
+                        <dt class="col-sm-3">Giao hàng:</dt>
+                        <dd class="col-sm-9">Toàn quốc</dd>
+                        <dt class="col-sm-3">Thời gian giao hàng</dt>
+                        <dd class="col-sm-9">3-4 ngày</dd>
+
+                    </dl>
+
+                    <form method="post" action="@Url.Action("BuyNow", "Payments", new { id = Model.id })">
+                        <div class="form-row  mt-4">
+                            <div class="form-group col-md flex-grow-0">
+                                <div class="input-group mb-3 input-spinner">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-light" type="button" id="button-plus"> + </button>
+                                    </div>
+                                    <input type="text" name="quantity" id="ipQuantity" class="form-control" value="1" width="50px">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-light" type="button" id="button-minus"> - </button>
+                                    </div>
+                                </div>
+                            </div> <!-- col.// -->
+                            <div class="form-group col-md">
+                                @if (Model.quantity > 0)
+                                {
+                                    <a href="#" id="addtocart" class="btn btn-primary">
+                                        <i class="fas fa-shopping-cart"></i> <span class="text">Thêm vào giỏ hàng</span>
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <span class="text">Mua ngay</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <a href="#" id="add-to-cart-btn" class="btn btn-primary" onclick=" Swal.fire({
+        title: 'Sản phẩm đã hết hàng',
+        text: 'Xin lỗi, sản phẩm này đã hết hàng. Vui lòng chọn sản phẩm khác!',
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK'
+      });">
+                                        <i class="fas fa-shopping-cart"></i> <span class="text">Thêm vào giỏ hàng</span>
+                                    </a>
+                                    <a href="#" id="" class="btn btn-danger" onclick=" Swal.fire({
+        title: 'Sản phẩm đã hết hàng',
+        text: 'Xin lỗi, sản phẩm này đã hết hàng. Vui lòng chọn sản phẩm khác!',
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'OK'
+      });">
+                                        <span class="text">Mua ngay</span>
+                                    </a>
+                                }
+                            </div> <!-- col.// -->
+                        </div> <!-- row.// -->
+                    </form>
+                    <!-- row.// -->
+
+
+                </article> <!---info-aside .// -->
+            </main> <!-- col.// -->
+        </div> <!-- row.// -->
+        <!-- ================ ITEM DETAIL END .// ================= -->
+
+    </div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+<!-- ========================= SECTION  ========================= -->
+<section class="section-name padding-y bg">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <h5 class="title-description">Chi tiết</h5>
+                <p>
+                    Chi tiết thông số sản phẩm
+                </p>
+                <ul class="list-check">
+                    <li>Chip: snapdragon 8 gen 2</li>
+                    <li>Ram: 16GB</li>
+                    <li>Bộ nhớ trong: 512GB</li>
+                    <li>Pin: 5120 mah</li>
+                    <li>Chống va đập tốt</li>
+                </ul>
+
+            </div> <!-- col.// -->
+
+            <aside class="col-md-4">
+                <div class="box">
+
+                    <h5 class="title-description">Hình ảnh</h5>
+                    <p>
+                        Hỉnh ảnh mô tả sản phẩm
+                    </p>
+
+
+                    <article class="media mb-3">
+                        <a href="#">
+
+                            <img src="~/Content/images/upload/@Model.Avatar" alt="Alternate Text" style="display: none" />
+                            <img class="img-sm mr-3" src="~/Content/images/upload/@Model.Avatar" alt="Alternate Text" />
+
+                        </a>
+                        <div class="media-body">
+                            <h6 class="mt-0"><a href="#">Chất lượng</a></h6>
+                            <p class="mb-2"> Chất lượng tuyệt vời!</p>
+                        </div>
+                    </article>
+                    <article class="media mb-3">
+                        <a href="#">
+
+                            <img class="img-sm mr-3" src="~/Content/images/upload/@Model.Avatar1" alt="Alternate Text" />
+
+                        </a>
+                        <div class="media-body">
+                            <h6 class="mt-0"><a href="#">Chất lượng</a></h6>
+                            <p class="mb-2"> Chất lượng tuyệt vời!</p>
+                        </div>
+                    </article>
+                    <article class="media mb-3">
+                        <a href="#">
+
+                            <img class="img-sm mr-3" src="~/Content/images/upload/@Model.Avatar2" alt="Alternate Text" />
+
+                        </a>
+                        <div class="media-body">
+                            <h6 class="mt-0"><a href="#">Chất lượng</a></h6>
+                            <p class="mb-2"> Chất lượng tuyệt vời!</p>
+                        </div>
+                    </article>
+
+
+                </div> <!-- box.// -->
+            </aside> <!-- col.// -->
+        </div> <!-- row.// -->
+    </div> <!-- container .//  -->
+</section>
+<link href="~/Content/binhluan.css" rel="stylesheet" />
+@* Bình luận sản phẩm *@
+<section class="section-content padding-y">
+    <div class="container">
+        <div class="row">
+            @* Kiểm tra sản phẩm đã dánh giá chưa nếu đánh giá rồi thì bỏ nút đánh giá *@
+
+            @* end *@
+            <div id="comment-section" class="col-sm-5 col-md-6 col-12 pb-4" style=" max-height: 550px;
+                overflow: auto;">
+                <h3 style="color: #808080;  
+                    top: 0; background: #F6F7F9; z-index: 1">
+                    Bình luận sản phẩm
+                </h3>
+                @foreach (var comment in ViewBag.comments)
+                {
+                    <div class="comment mt-4 text-justify float-left" style="padding-bottom: 10px">
+                        <img src="~/Content/images/upload/@comment.Avatar" alt="" class="rounded-circle" width="40" height="40">
+
+
+                        <h4>@comment.FirstName @comment.LastName</h4>
+                        <span>@comment.CreatTime</span>
+                        <br>
+                        <p>
+                            @comment.Comment1
+                        </p>
+                        <img src="~/Content/images/upload/@comment.img1" width="70" height="70" style="border-radius: 10px" />
+                        <video width="130" height="70" controls style="border-radius: 10px; margin: 0% 5% -5% 5%">
+                            <source src="~/Content/video/upload/@comment.video">
+                        </video>
+                        <img src="~/Content/images/upload/@comment.img2" width="70" height="70" style="border-radius: 10px" />
+
+                    </div>
+                }
+            </div>
+
+            @* Nhập bình luận *@
+            <div class="col-lg-4 col-md-5 col-sm-4 offset-md-1 offset-sm-1 col-12 mt-4 form_comment">
+
+                <form id="algin-form" method="post" action="@Url.Action("Comment", "Product")" enctype="multipart/form-data">
+                    <input type="hidden" name="ProductId" value="@Model.id" />
+                    <div class="form-group">
+                        <h4>Nhập bình luận</h4>
+                        <label for="message">Nội dung</label>
+                        <textarea name="binhluan" id="" msg cols="30" rows="5" class="form-control"
+                                  style="background-color: black; color: #ffffff"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Ảnh 1 sản phẩm (Nếu có)</label>
+                        <div class="col-md-10">
+                            <div class="image-upload-container">
+                                <input type="file" name="ImageUpload1" id="imageUpload" />
+                                <img id="previewImage" src="#" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Ảnh 2 sản phẩm (Nếu có)</label>
+                        <div class="col-md-10">
+                            <div class="image-upload-container">
+                                <input type="file" name="ImageUpload2" id="imageUpload1" />
+                                <img id="previewImage1" src="#" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="videoUpload">Chọn video (Nếu có)</label>
+                        <div class="col-md-10">
+                            <input type="file" name="VideoFile" class="form-control-file" id="videoUpload" accept="video/*">
+                            <video id="videoPreview" width="320" height="200" controls style="display: none; border-radius: 10px"></video>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-block btn-danger " value="Đăng">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+@* Ajax chưa đăng nhập chưa cho bấm vào đăng bình luận *@
+<script>
+    $("#algin-form").submit(function(event) {
+        // Kiểm tra trạng thái đăng nhập
+        if (@Html.Raw(Json.Encode(Session["idUser"])) == null) {
+            // Hiển thị thông báo và chuyển hướng đến trang Login
+             swal.fire({
+                      title: 'Lỗi!',
+                      text: 'Bạn chưa đăng nhập chưa thể bình luận!',
+                      icon: 'error',
+                      confirmButtonText: 'Đăng nhập ngay'
+                    }).then(function() {
+                      window.location.href = '@Url.Action("Login", "Home")';
+                    });
+            // Ngăn chặn việc gửi yêu cầu đến server
+            event.preventDefault();
+        }
+    });
+</script>
+
+
+@* Custom and call img *@
+<style>
+    .image-upload-container {
+        display: flex;
+        align-items: center;
+    }
+
+        .image-upload-container img {
+            max-width: 200px;
+            max-height: 150px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+
+    #previewImage {
+        display: none;
+        max-width: 200px;
+    }
+
+    #previewImage1 {
+        display: none;
+        max-width: 200px;
+    }
+</style>
+
+@* Hiển thị ảnh *@
+
+<script>
+
+    // ảnh 1
+    var input = document.getElementById("imageUpload");
+    var preview = document.getElementById("previewImage");
+
+    input.addEventListener("change", function () {
+        var file = this.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview.setAttribute("src", this.result);
+                preview.style.display = "block";
+            });
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // ảnh 2
+    var input1 = document.getElementById("imageUpload1");
+    var preview1 = document.getElementById("previewImage1");
+
+    input1.addEventListener("change", function () {
+        var file = this.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview1.setAttribute("src", this.result);
+                preview1.style.display = "block";
+            });
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // video
+    const videoUpload = document.getElementById("videoUpload");
+    const videoPreview = document.getElementById("videoPreview");
+
+    videoUpload.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                videoPreview.src = reader.result;
+                videoPreview.style.display = "block";
+            }
+        }
+    });
+
+</script>
+
+@* Kiểm tra nhập số lượng *@
+<script>
+    var inputQuantity = document.getElementById("ipQuantity");
+    var currentValue = parseInt(inputQuantity.value);
+    var maxQuantity = @Model.quantity;
+
+    function checkQuantity() {
+        if (currentValue > maxQuantity) {
+            // Hiển thị thông báo
+            swal.fire({
+    title: "Sản phẩm không đủ",
+    text: "Chỉ còn @Model.quantity sản phẩm",
+    icon: "warning",
+    button: "OK",
+}).then((result) => {
+    if (result) {
+        location.reload();
+    }
+});
+
+            return;
+            inputQuantity.value = maxQuantity;
+            currentValue = maxQuantity;
+        }
+        if (currentValue < 1) {
+            inputQuantity.value = 1;
+            currentValue = 1;
+        }
+    }
+
+    inputQuantity.addEventListener('input', function() {
+        currentValue = parseInt(inputQuantity.value);
+        checkQuantity();
+    });
+
+    document.getElementById("button-plus").addEventListener("click", function() {
+        currentValue++;
+        if (currentValue > maxQuantity) {
+             swal.fire({
+    title: "Sản phẩm không đủ",
+    text: "Chỉ còn @Model.quantity sản phẩm",
+    icon: "warning",
+    button: "OK",
+}).then((result) => {
+    if (result) {
+        location.reload();
+    }
+});
+            currentValue = maxQuantity;
+        }
+        inputQuantity.value = currentValue;
+    });
+
+    document.getElementById("button-minus").addEventListener("click", function() {
+        currentValue--;
+        if (currentValue < 1) {
+            currentValue = 1;
+        }
+        inputQuantity.value = currentValue;
+    });
+</script>
+
+
+@* Đánh giá *@
+<script>
+        $(function () {
+            $('.rating__input').click(function () {
+                var rating = $(this).val();
+                var productId = $('#productId').val();
+                var url = '@Url.Action("Rating", "Product")';
+                var isLoggedIn = '@(Session["idUser"] != null ? "True" : "False")';
+                if (isLoggedIn === "False") {
+                   swal.fire({
+                      title: 'Lỗi!',
+                      text: 'Bạn chưa đăng nhập chưa thể đánh giá!',
+                      icon: 'error',
+                      confirmButtonText: 'Đăng nhập ngay'
+                    }).then(function() {
+                      window.location.href = '@Url.Action("Login", "Home")';
+                    });
+
+                     return;
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: { productId: productId, rating: rating },
+
+                    success: function (data) {
+                        if (data && data.point !== undefined) {
+                            // Hiển thị thông tin đánh giá đã được lưu trữ
+                            setTimeout(function () {
+                                swal.fire("Thanks!", "Cảm ơn đánh giá " + data.point + " điểm cho shop!", "success").then(() => {
+                                    location.reload();
+                                });
+                            }, 1000); // 1000 milliseconds = 1 giây
+
+
+
+                        } else {
+                            swal.fire("Lỗi!", "Đánh giá không thành công!", "error");
+                        }
+                    },
+
+                    error: function () {
+                        swal.fire("Lỗi!", "Đánh giá không thành công!", "error");
+                    }
+                });
+            });
+        });
+</script>
+
+@* Slider ảnh *@
+<script>
+    // Lấy đối tượng ảnh lớn và các ảnh nhỏ
+    var imgBig = $("#imgBig");
+    var itemThumbs = $(".item-thumb");
+
+    // Gán sự kiện click cho tất cả các ảnh nhỏ
+    itemThumbs.click(function () {
+        // Lấy đường dẫn ảnh của ảnh nhỏ được bấm vào
+        var imgSrc = $(this).find("img").attr("src");
+
+        // Thay đổi đường dẫn ảnh của ảnh lớn bằng đường dẫn mới
+        imgBig.attr("src", imgSrc);
+    });
+</script>

@@ -1,0 +1,34 @@
+﻿@model List<WebBanHang.Context.Category>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+    <div class="container">
+        <nav class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-3">
+
+                    <div class="card card-category">
+                        <div class="img-wrap">
+                            <img src="~/Content/images/upload/">
+                        </div>
+                        <div class="card-body">
+                            <h4 class="card-title">@Html.ActionLink(item.Name, "ProductCategory", "Category", new { @Id = item.id }, null)</h4>
+
+                        </div>
+                    </div>
+                </div> <!-- col.// -->
+
+            }
+
+        </nav> <!-- row.// -->
+
+    </div> <!-- container .//  -->
+</section>
+

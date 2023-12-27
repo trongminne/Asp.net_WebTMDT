@@ -1,0 +1,102 @@
+﻿@model WebBanHang.Context.Category
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Sửa danh mục</h2>
+
+@using (Html.BeginForm("Edit", "Category", FormMethod.Post, new { enctype = "multipart/form-data" }))
+
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>@Model.Name</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, "Tên danh mục", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Avatar, "Ảnh đại diện", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="image-upload-container">
+                    <input type="file" name="ImageUpload" id="imageUpload" />
+                    @if (!string.IsNullOrWhiteSpace(Model.Avatar))
+                    {
+                        <img id="oldImage" src="@Url.Content("~/Content/images/upload/" + Model.Avatar)" alt="Ảnh đại diện" />
+                    }
+
+                    <img id="previewImage" src="#" alt="Ảnh đại diện" style="display: none;" />
+                    @Html.HiddenFor(model => model.Avatar)
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Slug, "Tên danh mục không dấu", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Slug, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Slug, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Lưu" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+@*  Custom and call img *@
+<style>
+    .image-upload-container {
+        display: flex;
+        align-items: center;
+    }
+
+        .image-upload-container img {
+            max-width: 200px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+</style>
+
+<script>
+    var input = document.getElementById("imageUpload");
+    var preview = document.getElementById("previewImage");
+    var oldImage = document.getElementById("oldImage");
+
+    input.addEventListener("change", function () {
+        var file = this.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                if (oldImage) {
+                    oldImage.style.display = "none"; // ẩn ảnh cũ
+                }
+                preview.setAttribute("src", this.result);
+                preview.style.display = "block"; // hiển thị ảnh mới
+            });
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+</script>
+
+
+@* end Custom and call img *@

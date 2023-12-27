@@ -1,0 +1,128 @@
+﻿
+@model WebBanHang.Context.User
+
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card mx-auto" style="max-width:520px; margin-top:40px;">
+    <article class="card-body">
+        <header class="mb-4"><h4 class="card-title">Đăng kí</h4></header>
+        @using (Html.BeginForm("Register", "Home", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "setTypeId()" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-row">
+                <div class="col form-group">
+                    <label>Họ</label>
+                    @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                    @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col form-group">
+                    <label>Tên</label>
+                    @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                    @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Ảnh đại diện</label>
+                <div class="col-md-10">
+                    <div class="image-upload-container">
+                        <input type="file" name="ImageUpload" id="imageUpload" />
+                        <img id="previewImage" src="#" alt="Ảnh đại diện" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+
+
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-row">
+                <div class="col form-group">
+                    <label>Số điện thoại</label>
+                    @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                    @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col form-group">
+                    <label>Địa chỉ</label>
+                    @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary btn-block" value="Đăng ký">
+            </div>
+
+            <div class="form-group">
+                <label class="custom-control custom-checkbox">  <input type="checkbox" class="custom-control-input" required> <div class="custom-control-label"> Bạn chập nhận <a href="#" style="font-weight: bold;">điều khoản</a>  </div> </label>
+            </div>
+
+        }
+    </article>
+</div>
+
+<p class="text-center mt-4">Bạn đã có tài khoản? <a href="~/Home/Login">Đăng nhập </a></p>
+<br><br>
+
+@* Custom and call img *@
+<style>
+    .image-upload-container {
+        display: flex;
+        align-items: center;
+    }
+
+        .image-upload-container img {
+            max-width: 200px;
+            max-height: 150px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+
+    #previewImage {
+        display: none;
+        max-width: 200px;
+    }
+
+</style>
+
+@* Hiển thị ảnh *@
+
+<script>
+            var input = document.getElementById("imageUpload");
+            var preview = document.getElementById("previewImage");
+
+            input.addEventListener("change", function () {
+                var file = this.files[0];
+
+                if (file) {
+                    var reader = new FileReader();
+
+                    reader.addEventListener("load", function () {
+                        preview.setAttribute("src", this.result);
+                        preview.style.display = "block";
+                    });
+
+                    reader.readAsDataURL(file);
+                }
+            });
+    
+</script>
+
+
+
+@* end Custom and call img *@

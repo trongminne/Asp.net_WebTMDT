@@ -1,0 +1,270 @@
+﻿@model WebBanHang.Context.Product
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
+@using (Html.BeginForm("Create", "Product", FormMethod.Post, new { enctype = "multipart/form-data", onsubmit = "setTypeId()" }))
+{
+    @Html.AntiForgeryToken()
+    <h2 style="padding-top: 10px">Thêm Sản phẩm</h2>
+
+    <div class="form-horizontal  " style="padding-bottom: 20px">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, "Tên sản phẩm", htmlAttributes: new { @class = "control-label col-md-2" })
+
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Avatar, "Ảnh đại diện", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="image-upload-container">
+                    <input type="file" name="ImageUpload" id="imageUpload" />
+                    <img id="previewImage" src="#" alt="Ảnh đại diện" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Avatar1, "Ảnh 1", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="image-upload-container">
+                    <input type="file" name="ImageUpload1" id="imageUpload1" />
+                    <img id="previewImage1" src="#" alt="Ảnh đại diện" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Avatar2, "Ảnh 2", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="image-upload-container">
+                    <input type="file" name="ImageUpload2" id="imageUpload2" />
+                    <img id="previewImage2" src="#" alt="Ảnh đại diện" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Avatar3, "Ảnh 3", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <div class="image-upload-container">
+                    <input type="file" name="ImageUpload3" id="imageUpload3" />
+                    <img id="previewImage3" src="#" alt="Ảnh đại diện" />
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="form-group ">
+            @Html.LabelFor(model => model.CategoryId, "Danh mục", htmlAttributes: new { @class = "control-label col-md-2 " })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.CategoryId, ViewData["CategoryList"] as SelectList, "Chọn danh mục", new { @class = "form-control " })
+                @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BrandId, "Thương hiệu", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.BrandId, ViewData["bandList"] as SelectList, "Chọn thương hiệu", new { @class = "form-control" })
+
+                @Html.ValidationMessageFor(model => model.BrandId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.quantity, "Số lượng kho", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.quantity, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.quantity, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ShortDes, "Ghi chú trên", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.ShortDes, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.ShortDes, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FullDescription, "Ghi chú dưới", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.FullDescription, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.FullDescription, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Price, "Giá", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PriceDiscount, "Khuyến mãi", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.PriceDiscount, new { htmlAttributes = new { @class = "form-control", id = "priceDiscountInput" } })
+                @Html.ValidationMessageFor(model => model.PriceDiscount, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <input type="hidden" name="typeId" id="typeIdInput" value="2" />
+
+        @* Kiểm tra nếu có giá trị trong input khuyến mãi thì set typeId *@
+        <script>
+            function setTypeId() {
+                var priceDiscountInput = document.getElementById("priceDiscountInput");
+                var typeIdInput = document.getElementById("typeIdInput");
+
+                if (priceDiscountInput.value == "" || isNaN(priceDiscountInput.value)) {
+                    typeIdInput.value = "2";
+                } else {
+                    typeIdInput.value = "1";
+                }
+            }
+        </script>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Slug, "Tên sản phẩm không dấu", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Slug, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Slug, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Thêm sản phẩm" class="btn btn-info" />
+            </div>
+        </div>
+    </div>
+}
+
+@* Custom and call img *@
+<style>
+    .image-upload-container {
+        display: flex;
+        align-items: center;
+    }
+
+        .image-upload-container img {
+            max-width: 200px;
+            max-height: 150px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+
+    #previewImage {
+        display: none;
+        max-width: 200px;
+    }
+
+    #previewImage1 {
+        display: none;
+        max-width: 200px;
+    }
+
+    #previewImage2 {
+        display: none;
+        max-width: 200px;
+    }
+
+    #previewImage3 {
+        display: none;
+        max-width: 200px;
+    }
+</style>
+
+@* Hiển thị ảnh *@
+
+<script>
+    var input = document.getElementById("imageUpload");
+    var preview = document.getElementById("previewImage");
+
+    input.addEventListener("change", function () {
+        var file = this.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview.setAttribute("src", this.result);
+                preview.style.display = "block";
+            });
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    var input1 = document.getElementById("imageUpload1");
+    var preview1 = document.getElementById("previewImage1");
+
+    input1.addEventListener("change", function () {
+        var file = this.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview1.setAttribute("src", this.result);
+                preview1.style.display = "block";
+            });
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    var input2 = document.getElementById("imageUpload2");
+    var preview2 = document.getElementById("previewImage2");
+
+    input2.addEventListener("change", function () {
+        var file = this.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview2.setAttribute("src", this.result);
+                preview2.style.display = "block";
+            });
+
+            reader.readAsDataURL(file);
+        }
+    });
+
+    var input3 = document.getElementById("imageUpload3");
+    var preview3 = document.getElementById("previewImage3");
+
+    input3.addEventListener("change", function () {
+        var file = this.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview3.setAttribute("src", this.result);
+                preview3.style.display = "block";
+            });
+
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+
+
+@* end Custom and call img *@
+

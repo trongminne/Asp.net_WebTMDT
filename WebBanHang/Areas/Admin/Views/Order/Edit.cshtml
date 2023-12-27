@@ -1,0 +1,45 @@
+﻿@model WebBanHang.Context.OrderDetail
+
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Sửa đơn hàng</h2>
+
+@using (Html.BeginForm("Edit", "Order", FormMethod.Post))
+
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Status, "Trạng thái", htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <select name="Status">
+                <option value="1" @if (Model.Status == 1) { <text> selected="selected" </text> }>Đang giao hàng</option>
+
+                <option value="0" @if (Model.Status == 0) { <text> selected="selected" </text> }>Chờ xác nhận</option>
+            </select>
+        </div>
+    </div>
+    @Html.HiddenFor(model => model.OrderId)
+    @Html.HiddenFor(model => model.ProductId)
+    @Html.HiddenFor(model => model.Quantity)
+    @Html.HiddenFor(model => model.idUser)
+
+
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="Lưu" class="btn btn-default" />
+        </div>
+    </div>
+</div>
+}
+

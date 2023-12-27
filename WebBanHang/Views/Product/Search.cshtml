@@ -1,0 +1,431 @@
+﻿@model List<WebBanHang.Context.Product>
+
+@{
+    ViewBag.Title = "Search";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-content padding-y">
+    <div class="container">
+
+
+        <div class="row">
+            <main class="col-md-12">
+
+                <header class="mb-3">
+                    <div class="form-inline">
+                        <strong class="mr-md-auto">@ViewBag.Count sản phẩm</strong>
+
+
+                        <select class="mr-2 form-control form-select form-select-lg" id="sort-option">
+                            <option value="asc">Thấp - Cao</option>
+                            <option value="desc">Cao - Thấp</option>
+                        </select>
+
+                        <div class="btn-group">
+                            <a href="#" id="list-view-btn" class="btn btn-light btn-list" data-toggle="tooltip" title="List view">
+                                <i class="fa fa-bars"></i>
+                            </a>
+
+                            <a href="#" id="grid-view-btn" class="btn btn-light btn-grid active" data-toggle="tooltip" title="Grid view">
+                                <i class="fa fa-th"></i>
+                            </a>
+
+                        </div>
+                    </div>
+                </header><!-- sect-heading -->
+                @* Giao diện list *@
+                <div id="product-list" class="list-group">
+                    @foreach (var item in Model)
+                    {
+                        if (item.quantity > 0)
+                        {
+                            <article class="card card-product-list">
+                                <div class="row no-gutters thumbnail">
+                                    <aside class="col-md-3">
+                                        <a href="@Url.Action("Detail", "Product", new { Id = item.id })" class="img-wrap">
+                                            <span class="badge badge-danger"> NEW </span>
+                                            <img src="~/Content/images/upload/@item.Avatar">
+                                        </a>
+                                    </aside> <!-- col.// -->
+                                    <div class="col-md-6">
+                                        <div class="info-main">
+                                            <a href="@Url.Action("Detail", "Product", new { Id = item.id })" class="h5 title"> @item.Name</a>
+                                            <div class="rating-wrap mb-2">
+                                                <ul class="rating-stars">
+                                                    <li style="width:100%" class="stars-active">
+                                                        <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                                                        <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                                                        <i class="fa fa-star"></i>
+                                                    </li>
+                                                    <li>
+                                                        <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                                                        <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                                                        <i class="fa fa-star"></i>
+                                                    </li>
+                                                </ul>
+                                                <div class="label-rating">9/10</div>
+                                            </div> <!-- rating-wrap.// -->
+
+                                            <p class="mb-3">
+                                                <span class="tag"> <i class="fa fa-check"></i> Verified</span>
+                                                <span class="tag"> 5 Years </span>
+                                                <span class="tag"> 80 reviews </span>
+                                                <span class="tag"> Russia </span>
+                                            </p>
+                                            <p>
+                                                @item.ShortDes
+                                            </p>
+                                        </div> <!-- info-main.// -->
+                                    </div> <!-- col.// -->
+                                    <aside class="col-sm-3">
+                                        <div class="info-aside">
+                                            <div class="price-wrap">
+                                                <span class="h5 price"> @String.Format("{0:#,###}", item.Price) ₫</span>
+                                                <small class="text-muted">/per item</small>
+                                            </div> <!-- price-wrap.// -->
+                                            <small class="text-warning">Paid shipping</small>
+
+                                            <p class="text-muted mt-3">Grand textile Co</p>
+                                            <p class="mt-3">
+                                                <a href="" class="btn btn-outline-primary add-to-cart" data-id="@item.id">
+                                                    <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                                </a>
+                                                <input type="hidden" class="form-control ipQuantity" value="1">
+                                            </p>
+
+
+
+                                            <label class="custom-control mt-3 custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input">
+                                                <div class="custom-control-label">
+                                                    Add to compare
+                                                </div>
+                                            </label>
+                                        </div> <!-- info-aside.// -->
+                                    </aside> <!-- col.// -->
+                                </div> <!-- row.// -->
+                            </article> <!-- card-product .// -->
+                        }
+                    }
+
+                </div>
+
+                @* Giao diện gird *@
+                <div id="product-list-grid" class="row product-list">
+                    @foreach (var item in Model)
+                    {
+                        if (item.quantity > 0)
+                        {
+                            <a href="@Url.Action("Detail", "Product", new { Id = item.id })">
+                                <div class="col-md-3 card-product-list card-product-list1">
+                                    <figure class="card card-product-grid thumbnail">
+                                        <div class="img-wrap">
+                                            <span class="badge badge-danger"> NEW </span>
+                                            <img src="~/Content/images/upload/@item.Avatar">
+                                        </div> <!-- img-wrap.// -->
+                                        <figcaption class="info-wrap">
+                                            <a href="#" class="title mb-2"> @item.ShortDes</a>
+                                            <div class="price-wrap">
+                                                <span class="price">@String.Format("{0:#,###}", item.Price) ₫</span>
+                                                <small class="text-muted">/per item</small>
+                                            </div> <!-- price-wrap.// -->
+
+                                            <p class="mb-2"> 2 Pieces  <small class="text-muted">(Min Order)</small></p>
+
+                                            <p class="text-muted "> @item.Name</p>
+
+                                            <hr>
+
+                                            <p class="mb-3">
+                                                <span class="tag"> <i class="fa fa-check"></i> Verified</span>
+                                                <span class="tag"> 2 Years </span>
+                                                <span class="tag"> 23 reviews </span>
+                                                <span class="tag"> Japan </span>
+                                            </p>
+
+                                            <label class="custom-control mb-3 custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input">
+                                                <div class="custom-control-label">
+                                                    Add to compare
+                                                </div>
+                                            </label>
+                                            <a href="#" class="btn btn-outline-primary add-to-cart" data-id="@item.id">
+                                                <i class="fa fa-shopping-cart"></i> Thêm vào giỏ hàng
+                                            </a>
+                                            <input type="hidden" class="form-control ipQuantity" value="1">
+
+                                        </figcaption>
+                                    </figure>
+                                </div> <!-- col.// -->
+
+                            </a>
+                        }
+                    }
+                </div> <!-- row end.// -->
+                @* Phân trang *@
+
+                <nav class="mb-4" aria-label="Page navigation sample">
+                    <ul class="pagination">
+                        <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Search", new { price = "", name = ViewBag.SearchTerm, page = ViewBag.CurrentPage - 1 })">Previous</a>
+
+
+                        </li>
+                        @if (ViewBag.TotalPages <= 7)
+                        {
+                            for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Search", new { price = "", name = ViewBag.SearchTerm, page = i })">@i</a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            int startPage = ViewBag.CurrentPage - 2;
+                            int endPage = ViewBag.CurrentPage + 2;
+                            if (startPage < 1)
+                            {
+                                endPage += Math.Abs(startPage) + 1;
+                                startPage = 1;
+                            }
+
+                            if (endPage > ViewBag.TotalPages)
+                            {
+                                startPage -= (endPage - ViewBag.TotalPages);
+                                endPage = ViewBag.TotalPages;
+                            }
+
+                            if (startPage > 1)
+                            {
+                                <li class="page-item">
+
+                                </li>
+                                if (startPage > 2)
+                                {
+                                    <li class="page-item disabled">
+                                        <a class="page-link">...</a>
+                                    </li>
+                                }
+                            }
+
+                            for (int i = startPage; i <= endPage; i++)
+                            {
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("Search", new { price = "", name = ViewBag.SearchTerm, page = i })">@i</a>
+
+                                </li>
+                            }
+
+                            if (endPage < ViewBag.TotalPages)
+                            {
+                                if (endPage < ViewBag.TotalPages - 1)
+                                {
+                                    <li class="page-item disabled">
+                                        <a class="page-link">...</a>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" href="@Url.Action("Search", new { price = "", name = Request["name"], page = ViewBag.TotalPages })">@ViewBag.TotalPages</a>
+                                </li>
+                            }
+                        }
+                        <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Search", new { price = Request["price"], name = Request["name"], page = ViewBag.CurrentPage + 1 })">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </main> <!-- col.// -->
+        </div>
+    </div> <!-- container .//  -->
+</section>
+<!-- ========================= SECTION CONTENT END// ========================= -->
+@* Chuyển đổi giao diện *@
+<script>
+    const listViewBtn = document.getElementById('list-view-btn');
+    const gridViewBtn = document.getElementById('grid-view-btn');
+    const productListView = document.getElementById('product-list');
+    const productGridView = document.getElementById('product-list-grid');
+
+    // get the saved view mode from localStorage or default to "grid"
+    const viewMode = localStorage.getItem('viewMode') || 'grid';
+
+    // hide/show views based on the saved view mode
+    if (viewMode === 'list') {
+        productListView.classList.remove('d-none');
+        productGridView.classList.add('d-none');
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+    } else {
+        productListView.classList.add('d-none');
+        productGridView.classList.remove('d-none');
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+    }
+
+    listViewBtn.addEventListener('click', function () {
+        productListView.classList.remove('d-none');
+        productGridView.classList.add('d-none');
+        listViewBtn.classList.add('active');
+        gridViewBtn.classList.remove('active');
+        // save the current view mode to localStorage
+        localStorage.setItem('viewMode', 'list');
+    });
+
+    gridViewBtn.addEventListener('click', function () {
+        productGridView.classList.remove('d-none');
+        productListView.classList.add('d-none');
+        gridViewBtn.classList.add('active');
+        listViewBtn.classList.remove('active');
+        // save the current view mode to localStorage
+        localStorage.setItem('viewMode', 'grid');
+    });
+</script>
+
+@* Sắp xếp theo giá list *@
+<script>
+    $(document).ready(function () {
+        // Gán sự kiện onchange cho select
+        $("#sort-option").change(function () {
+            // Lấy giá trị của option được chọn
+            var sortValue = $(this).val();
+            // Lấy danh sách sản phẩm
+            var products = $(".card-product-list");
+            // Sắp xếp sản phẩm theo giá
+            products.sort(function (a, b) {
+                var priceA = $(a).find(".price").text().replace(/[^\d]/g, "");
+                var priceB = $(b).find(".price").text().replace(/[^\d]/g, "");
+                if (sortValue == "desc") {
+                    return parseInt(priceB) - parseInt(priceA);
+                } else {
+                    return parseInt(priceA) - parseInt(priceB);
+                }
+            });
+            // Xóa sản phẩm hiện tại và thêm lại theo thứ tự đã sắp xếp
+            $(".card-product-list").remove();
+            $("#product-list").append(products);
+        });
+    });
+</script>
+
+@* Sắp xếp theo giá grid*@
+<script>
+    $(document).ready(function () {
+        // Gán sự kiện onchange cho select
+        $("#sort-option").change(function () {
+            // Lấy giá trị của option được chọn
+            var sortValue = $(this).val();
+            // Lấy danh sách sản phẩm
+            var products = $(".card-product-list1");
+            // Sắp xếp sản phẩm theo giá
+            products.sort(function (a, b) {
+                var priceA = $(a).find(".price").text().replace(/[^\d]/g, "");
+                var priceB = $(b).find(".price").text().replace(/[^\d]/g, "");
+                if (sortValue == "desc") {
+                    return parseInt(priceB) - parseInt(priceA);
+                } else {
+                    return parseInt(priceA) - parseInt(priceB);
+                }
+            });
+            // Xóa sản phẩm hiện tại và thêm lại theo thứ tự đã sắp xếp
+            $(".card-product-list1").remove();
+            $("#product-list-grid").append(products);
+        });
+    });
+</script>
+
+@* Thêm giỏi hàng &  *@
+<script type="text/javascript">
+$(function () {
+    var cartItems = []; // mảng lưu các sản phẩm trong giỏ hàng
+    $(".add-to-cart").click(function () {
+        var model = {};
+        //lấy id sản phẩm
+        model.Id = $(this).data("id");
+        // lấy số lượng đặt hàng
+        model.Quantity = $(this).siblings(".ipQuantity").val();
+
+        // kiểm tra sản phẩm đã được thêm vào trước đó hay chưa
+        var index = cartItems.findIndex(function(item) {
+            return item.Id === model.Id;
+        });
+        if (index >= 0) {
+            swal.fire({
+                title: 'Kiểm tra',
+                text: 'Sản phẩm đã được thêm từ trước đó!',
+                icon: 'info',
+                confirmButtonColor: '#858796',
+                confirmButtonText: 'OK'
+            });
+            return false; // không thêm sản phẩm mới
+        }
+        var self = this; // lưu lại giá trị của this
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("AddToCart", "Cart")',
+            data:  JSON.stringify(model) ,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function () {
+                cartItems.push(model); // thêm sản phẩm vào mảng
+                var parent = $(self).parents('.thumbnail');
+                var cart = $(document).find('#cart-shop');
+                var src = parent.find('img').attr('src');
+
+                var parTop = parent.offset().top;
+                var parLeft = parent.offset().left;
+                console.log(src);
+                $('<img />', {
+                    class: 'img-product-fly',
+                    src: src
+                }).appendTo('body').css({ // vị trí
+                    'top': parTop,
+                    'left': parseInt(parLeft) + parseInt(parent.width()) - 50
+                });
+                setTimeout(function () {
+                    $(document).find('.img-product-fly').css({
+                        'top': cart.offset().top,
+                        'left': cart.offset().left
+                    });
+                    setTimeout(function () {
+                        $(document).find('.img-product-fly').remove();
+                        swal.fire({
+                            title: 'Thành công',
+                            text: 'Đã thêm sản phẩm vào giỏ hàng thành công!',
+                            icon: 'success',
+                            confirmButtonColor: '#43b581',
+                            confirmButtonText: 'OK'
+                        });
+                        var citem = parseInt(cart.find('#count-item').data('count')) + 1;
+                        cart.find('#count-item').text(citem).data('count', citem);
+                        $(document).find('.add-to-cart').removeClass('disable')
+                    }, 1000);
+                }, 500);
+                 // Kiểm tra số lượng sản phẩm trong giỏ hàng
+                if (cartItems.length == 1) {
+                    // không load lại trang khi lần đầu thêm sản phẩm vào giỏ hàng
+                } else {
+                    $('#CartCount').show().text(@Session["count"] + cartItems.length);
+                }
+
+            },
+            error: function () {
+                swal.fire({
+                    title: 'Lỗi',
+                    text: 'Lỗi thêm sản phẩm vào giỏ hàng!',
+                    icon: 'error',
+                    confirmButtonColor: '#ff6b6b',
+                    confirmButtonText: 'OK'
+                })
+            }
+        });
+        return false;
+    });
+});
+
+</script>
